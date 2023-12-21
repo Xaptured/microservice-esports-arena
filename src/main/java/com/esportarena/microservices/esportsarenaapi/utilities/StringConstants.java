@@ -44,6 +44,11 @@ public class StringConstants {
     public static final String ENCRYPTION_SALT_GENERATOR = "ENCRYPTION_SALT_GENERATOR";
     public static final String ENCRYPTION_OUTPUT_TYPE = "ENCRYPTION_OUTPUT_TYPE";
 
+
+    public static final String EMAIL_NOT_PRESENT = "Email not present in Database";
+    public static final String IO_ERROR = "Input Output Error";
+    public static final String ID_NOT_PRESENT = "Id not present in Database";
+
     private StringConstants(){}
 
 }
