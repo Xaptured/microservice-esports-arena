@@ -5,6 +5,7 @@ import com.esportarena.microservices.esportsarenaapi.exceptions.ValidationExcept
 import com.esportarena.microservices.esportsarenaapi.models.Event;
 import com.esportarena.microservices.esportsarenaapi.models.Leaderboard;
 import com.esportarena.microservices.esportsarenaapi.models.Team;
+import com.esportarena.microservices.esportsarenaapi.models.Viewer;
 import com.esportarena.microservices.esportsarenaapi.utilities.StringConstants;
 import io.micrometer.common.util.StringUtils;
 import org.apache.logging.log4j.util.Strings;
@@ -104,6 +105,7 @@ public class EventServiceHelper {
             LOGGER.error("Validation failed in EventServiceHelper.class : checkLeaderboardFromUI for object: null");
             throw new ValidationException(StringConstants.VALIDATION_ERROR);
         }
+        LOGGER.info(StringConstants.VALIDATION_PASSED_UI);
     }
 
     public void checkLeaderboardFromDB(Leaderboard leaderboard) throws ValidationException {
@@ -111,6 +113,7 @@ public class EventServiceHelper {
             LOGGER.error("Validation failed in EventServiceHelper.class : checkLeaderboardFromDB for object: null");
             throw new ValidationException(StringConstants.VALIDATION_ERROR);
         }
+        LOGGER.info(StringConstants.VALIDATION_PASSED_DB);
     }
 
     public void checkFileFromUI(MultipartFile file, Integer eventId) throws ValidationException {
@@ -118,6 +121,7 @@ public class EventServiceHelper {
             LOGGER.error("Validation failed in EventServiceHelper.class : checkFileFromUI for object: null");
             throw new ValidationException(StringConstants.VALIDATION_ERROR);
         }
+        LOGGER.info(StringConstants.VALIDATION_PASSED_UI);
     }
 
     public void checkEventIdAndEmailFromUI(Integer eventId, String email) throws ValidationException {
@@ -125,6 +129,7 @@ public class EventServiceHelper {
             LOGGER.error("Validation failed in EventServiceHelper.class : checkEventIdAndEmailFromUI for object: null");
             throw new ValidationException(StringConstants.VALIDATION_ERROR);
         }
+        LOGGER.info(StringConstants.VALIDATION_PASSED_UI);
     }
 
     public void checkEventIdAndEmailFromDB(Leaderboard leaderboard) throws ValidationException {
@@ -132,5 +137,30 @@ public class EventServiceHelper {
             LOGGER.error("Validation failed in EventServiceHelper.class : checkEventIdAndEmailFromDB for object: null");
             throw new ValidationException(StringConstants.VALIDATION_ERROR);
         }
+        LOGGER.info(StringConstants.VALIDATION_PASSED_DB);
+    }
+
+    public void checkViewerFromUI(Viewer viewer) throws ValidationException {
+        if(StringUtils.isBlank(viewer.getEmail()) || StringUtils.isEmpty(viewer.getEmail()) || viewer.getEventId() == null) {
+            LOGGER.error("Validation failed in EventServiceHelper.class : checkViewerFromUI for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        }
+        LOGGER.info(StringConstants.VALIDATION_PASSED_UI);
+    }
+
+    public void checkViewerFromDB(Viewer viewer) throws ValidationException {
+        if(StringUtils.isBlank(viewer.getMessage()) || StringUtils.isEmpty(viewer.getMessage())) {
+            LOGGER.error("Validation failed in EventServiceHelper.class : checkViewerFromDB for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        }
+        LOGGER.info(StringConstants.VALIDATION_PASSED_DB);
+    }
+
+    public void checkEmailAndIdForViewerFromUI(String email, Integer eventId) throws ValidationException {
+        if(StringUtils.isBlank(email) || StringUtils.isEmpty(email) || eventId == null) {
+            LOGGER.error("Validation failed in EventServiceHelper.class : checkEmailAndIdForViewerFromUI for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        }
+        LOGGER.info(StringConstants.VALIDATION_PASSED_UI);
     }
 }

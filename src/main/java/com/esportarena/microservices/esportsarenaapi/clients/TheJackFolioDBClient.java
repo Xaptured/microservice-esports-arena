@@ -52,4 +52,31 @@ public interface TheJackFolioDBClient {
 
     @GetMapping("/events/get-document/{eventId}")
     public ResponseEntity<Document> findDoc(@PathVariable Integer eventId);
+
+    @PostMapping("/events/save-viewer")
+    public ResponseEntity<Viewer> saveViewer(@RequestBody Viewer viewer);
+
+    @GetMapping("/events/is-viewer")
+    public ResponseEntity<Boolean> isViewer(@RequestParam String email, @RequestParam Integer eventId);
+
+    @PostMapping("/clients/save-partner")
+    public ResponseEntity<Partner> saveOrUpdatePartner(@RequestBody Partner partner);
+
+    @GetMapping("/clients/get-partner/{email}")
+    public ResponseEntity<Partner> findPartner(@PathVariable String email);
+
+    @RequestMapping(path = "/clients/save-documents/{email}", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<Partner> saveDocuments(@RequestPart MultipartFile image, @RequestPart MultipartFile doc, @PathVariable String email);
+
+    @GetMapping("/clients/get-logo/{email}")
+    public ResponseEntity<Document> findLogo(@PathVariable String email);
+
+    @GetMapping("/clients/get-document/{email}")
+    public ResponseEntity<Document> findDoc(@PathVariable String email);
+
+    @GetMapping("/events/get-today-events")
+    public ResponseEntity<List<Event>> findEventsScheduledForToday();
+
+    @PostMapping("/events/update-event-status")
+    public ResponseEntity<String> updateEventStatus(@RequestParam String status, @RequestParam String eventName);
 }
