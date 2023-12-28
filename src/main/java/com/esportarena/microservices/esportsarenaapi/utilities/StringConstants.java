@@ -12,6 +12,7 @@ public class StringConstants {
     public static final String MAPPING_ERROR = "Error occurred while mapping";
     public static final String DATABASE_ERROR = "Error occurred while database operation";
     public static final String VALIDATION_ERROR = "Error occurred while validation";
+    public static final String FILE_NOT_PRESENT = "File not present";
     public static final String VALIDATION_PASSED_UI = "Validation passed for incoming request from UI";
     public static final String VALIDATION_PASSED_DB = "Validation passed for incoming request from DB";
     public static final String FALLBACK_MESSAGE = "Something went wrong. Please try again later";

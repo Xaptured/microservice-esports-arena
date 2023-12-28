@@ -3,10 +3,7 @@ package com.esportarena.microservices.esportsarenaapi.controllers;
 import com.esportarena.microservices.esportsarenaapi.exceptions.DataBaseOperationException;
 import com.esportarena.microservices.esportsarenaapi.exceptions.MapperException;
 import com.esportarena.microservices.esportsarenaapi.exceptions.ValidationException;
-import com.esportarena.microservices.esportsarenaapi.models.Document;
-import com.esportarena.microservices.esportsarenaapi.models.Event;
-import com.esportarena.microservices.esportsarenaapi.models.Leaderboard;
-import com.esportarena.microservices.esportsarenaapi.models.Team;
+import com.esportarena.microservices.esportsarenaapi.models.*;
 import com.esportarena.microservices.esportsarenaapi.services.EventService;
 import com.esportarena.microservices.esportsarenaapi.utilities.StringConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @Tag(name = "Event", description = "Event management APIs")
 @RestController
@@ -260,8 +260,8 @@ public class EventController {
             summary = "Save documents",
             description = "Save documents and gives the same documents response with a message which defines whether the request is successful or not."
     )
-    @PostMapping("/save-documents/{eventId}")
-    public ResponseEntity<Leaderboard> saveLeaderboardDocument(@RequestParam MultipartFile doc, @PathVariable Integer eventId) {
+    @RequestMapping(path = "/save-documents/{eventId}", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<Leaderboard> saveLeaderboardDocument(@RequestPart MultipartFile doc, @PathVariable Integer eventId) {
         Leaderboard response = null;
         try{
             if(isRetryEnabled){
@@ -299,6 +299,56 @@ public class EventController {
         }
         isRetryEnabled = false;
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Operation(
+            summary = "Save viewer",
+            description = "Save viewer with a message which defines whether the request is successful or not."
+    )
+    @PostMapping("/save-viewer")
+    public ResponseEntity<Viewer> saveViewer(@RequestBody Viewer viewer) {
+        Viewer response = null;
+        try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            response = service.saveViewer(viewer);
+        } catch (ValidationException | MapperException | DataBaseOperationException exception){
+            response = new Viewer();
+            response.setMessage(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+    }
+
+    @Operation(
+            summary = "Is a viewer or not",
+            description = "Is a viewer or not."
+    )
+    @GetMapping("/is-viewer")
+    public ResponseEntity<Boolean> isViewer(@RequestParam String email, @RequestParam Integer eventId) {
+        Boolean response = null;
+        try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            response = service.isViewer(email, eventId);
+            if(!response) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+            }
+        } catch (ValidationException exception){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }

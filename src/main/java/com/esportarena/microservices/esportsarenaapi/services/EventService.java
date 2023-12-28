@@ -198,4 +198,23 @@ public class EventService {
         }
     }
 
+    public Viewer saveViewer(Viewer viewer) throws ValidationException, DataBaseOperationException, MapperException {
+        validation.checkViewerFromUI(viewer);
+        ResponseEntity<Viewer> response = dbClient.saveViewer(viewer);
+        Viewer responseBody = response.getBody();
+        validation.checkViewerFromDB(responseBody);
+        if(responseBody.getMessage().equals(StringConstants.DATABASE_ERROR)){
+            throw new DataBaseOperationException(responseBody.getMessage());
+        }
+        else if(responseBody.getMessage().equals(StringConstants.MAPPING_ERROR)){
+            throw new MapperException(responseBody.getMessage());
+        }
+        return responseBody;
+    }
+
+    public boolean isViewer(String email, Integer eventId) throws ValidationException {
+        validation.checkEmailAndIdForViewerFromUI(email, eventId);
+        ResponseEntity<Boolean> response = dbClient.isViewer(email, eventId);
+        return Boolean.TRUE.equals(response.getBody());
+    }
 }
