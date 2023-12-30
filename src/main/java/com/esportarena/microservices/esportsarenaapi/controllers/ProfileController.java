@@ -6,8 +6,10 @@ import com.esportarena.microservices.esportsarenaapi.exceptions.ValidationExcept
 import com.esportarena.microservices.esportsarenaapi.models.Document;
 import com.esportarena.microservices.esportsarenaapi.models.Partner;
 import com.esportarena.microservices.esportsarenaapi.models.ProfileDetail;
+import com.esportarena.microservices.esportsarenaapi.models.Team;
 import com.esportarena.microservices.esportsarenaapi.services.ProfileService;
 import com.esportarena.microservices.esportsarenaapi.utilities.StringConstants;
+import io.github.resilience4j.retry.annotation.Retry;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
@@ -39,6 +41,7 @@ public class ProfileController {
             description = "Save profile and gives the same profile response with a message which defines whether the request is successful or not."
     )
     @PostMapping("/save-profile")
+    @Retry(name = "save-or-update-profile-details-db-retry", fallbackMethod = "saveOrUpdateProfileDetailsDbRetry")
     public ResponseEntity<ProfileDetail> saveOrUpdateProfileDetails(@RequestBody ProfileDetail details) {
         ProfileDetail response = null;
         try{
@@ -61,11 +64,20 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    public ResponseEntity<ProfileDetail> saveOrUpdateProfileDetailsDbRetry(ProfileDetail details, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        ProfileDetail detailResponse = new ProfileDetail();
+        detailResponse.setMessage(StringConstants.FALLBACK_MESSAGE);
+        return ResponseEntity.status(HttpStatus.OK).body(detailResponse);
+    }
+
     @Operation(
             summary = "Get profile",
             description = "Get profile and gives the same profile response with a message which defines whether the request is successful or not."
     )
     @GetMapping("/get-profile/{email}")
+    @Retry(name = "get-profile-details-db-retry", fallbackMethod = "getProfileDetailsDbRetry")
     public ResponseEntity<ProfileDetail> getProfileDetails(@PathVariable String email) {
         ProfileDetail response = null;
         try{
@@ -85,11 +97,20 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    public ResponseEntity<ProfileDetail> getProfileDetailsDbRetry(String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        ProfileDetail detailResponse = new ProfileDetail();
+        detailResponse.setMessage(StringConstants.FALLBACK_MESSAGE);
+        return ResponseEntity.status(HttpStatus.OK).body(detailResponse);
+    }
+
     @Operation(
             summary = "Save partner",
             description = "Save partner and gives the same partner response with a message which defines whether the request is successful or not."
     )
     @PostMapping("/save-partner")
+    @Retry(name = "save-or-update-partner-db-retry", fallbackMethod = "saveOrUpdatePartnerDbRetry")
     public ResponseEntity<Partner> saveOrUpdatePartner(@RequestBody Partner partner) {
         Partner response = null;
         try {
@@ -109,11 +130,20 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    public ResponseEntity<Partner> saveOrUpdatePartnerDbRetry(Partner partner, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        Partner partnerResponse = new Partner();
+        partnerResponse.setMessage(StringConstants.FALLBACK_MESSAGE);
+        return ResponseEntity.status(HttpStatus.OK).body(partnerResponse);
+    }
+
     @Operation(
             summary = "Get partner",
             description = "Get partner and gives the response with a message which defines whether the request is successful or not."
     )
     @GetMapping("/get-partner/{email}")
+    @Retry(name = "find-partner-db-retry", fallbackMethod = "findPartnerDbRetry")
     public ResponseEntity<Partner> findPartner(@PathVariable String email) {
         Partner response = null;
         try {
@@ -136,11 +166,20 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    public ResponseEntity<Partner> findPartner(String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        Partner partnerResponse = new Partner();
+        partnerResponse.setMessage(StringConstants.FALLBACK_MESSAGE);
+        return ResponseEntity.status(HttpStatus.OK).body(partnerResponse);
+    }
+
     @Operation(
             summary = "Save documents",
             description = "Save documents and gives the same documents response with a message which defines whether the request is successful or not."
     )
     @RequestMapping(path = "/save-documents/{email}", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @Retry(name = "save-documents-db-retry", fallbackMethod = "saveDocumentsDbRetry")
     public ResponseEntity<Partner> saveDocuments(@RequestPart MultipartFile image, @RequestPart MultipartFile doc, @PathVariable String email) {
         Partner response = null;
         try {
@@ -163,11 +202,20 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    public ResponseEntity<Partner> saveDocumentsDbRetry(MultipartFile image, MultipartFile doc, String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        Partner partnerResponse = new Partner();
+        partnerResponse.setMessage(StringConstants.FALLBACK_MESSAGE);
+        return ResponseEntity.status(HttpStatus.OK).body(partnerResponse);
+    }
+
     @Operation(
             summary = "Get logo",
             description = "Get logo and gives the response with a message which defines whether the request is successful or not."
     )
     @GetMapping("/get-logo/{email}")
+    @Retry(name = "find-logo-db-retry", fallbackMethod = "findLogoDbRetry")
     public ResponseEntity<Document> findLogo(@PathVariable String email) {
         Document response = null;
         try {
@@ -190,11 +238,20 @@ public class ProfileController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    public ResponseEntity<Document> findLogoDbRetry(String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        Document documentResponse = new Document();
+        documentResponse.setMessage(StringConstants.FALLBACK_MESSAGE);
+        return ResponseEntity.status(HttpStatus.OK).body(documentResponse);
+    }
+
     @Operation(
             summary = "Get document",
             description = "Get document and gives the response with a message which defines whether the request is successful or not."
     )
     @GetMapping("/get-document/{email}")
+    @Retry(name = "find-doc-db-retry", fallbackMethod = "findDocDbRetry")
     public ResponseEntity<Document> findDoc(@PathVariable String email) {
         Document response = null;
         try {
@@ -215,5 +272,13 @@ public class ProfileController {
         }
         isRetryEnabled = false;
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public ResponseEntity<Document> findDocDbRetry(String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        Document documentResponse = new Document();
+        documentResponse.setMessage(StringConstants.FALLBACK_MESSAGE);
+        return ResponseEntity.status(HttpStatus.OK).body(documentResponse);
     }
 }
