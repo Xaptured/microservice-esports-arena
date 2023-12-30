@@ -10,18 +10,66 @@ management:
     health:
       show-details: always
 
-#resilience4j:
-#  retry:
-#    instances:
-#      save-comments-db-retry:
-#        max-attempts: 3
-#        wait-duration: 5s
-#      get-comments-db-retry:
-#        max-attempts: 3
-#        wait-duration: 5s
-#      save-credential-db-retry:
-#        max-attempts: 3
-#        wait-duration: 5s
-#      get-credential-db-retry:
-#        max-attempts: 3
-#        wait-duration: 5s
+resilience4j:
+  retry:
+    instances:
+      save-or-update-profile-details-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      get-profile-details-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      save-or-update-partner-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      find-partner-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      save-documents-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      find-logo-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      find-doc-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      save-or-update-team-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      get-team-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      update-team-status-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      find-upcoming-events-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      find-leaderboard-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      find-leaderboard-doc-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      save-or-update-event-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      get-event-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      save-leaderboard-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      save-leaderboard-document-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      generate-excel-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      save-viewer-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      is-viewer-db-retry:
+        max-attempts: 3
+        wait-duration: 5s

@@ -57,7 +57,7 @@ public interface TheJackFolioDBClient {
     public ResponseEntity<Viewer> saveViewer(@RequestBody Viewer viewer);
 
     @GetMapping("/events/is-viewer")
-    public ResponseEntity<Boolean> isViewer(@RequestParam String email, @RequestParam Integer eventId);
+    public ResponseEntity<Viewer> isViewer(@RequestParam String email, @RequestParam Integer eventId);
 
     @PostMapping("/clients/save-partner")
     public ResponseEntity<Partner> saveOrUpdatePartner(@RequestBody Partner partner);

@@ -212,9 +212,13 @@ public class EventService {
         return responseBody;
     }
 
-    public boolean isViewer(String email, Integer eventId) throws ValidationException {
+    public Viewer isViewer(String email, Integer eventId) throws ValidationException, DataBaseOperationException {
         validation.checkEmailAndIdForViewerFromUI(email, eventId);
-        ResponseEntity<Boolean> response = dbClient.isViewer(email, eventId);
-        return Boolean.TRUE.equals(response.getBody());
+        ResponseEntity<Viewer> response = dbClient.isViewer(email, eventId);
+        Viewer responseBody = response.getBody();
+        if(responseBody.getMessage().equals(StringConstants.DATABASE_ERROR)){
+            throw new DataBaseOperationException(responseBody.getMessage());
+        }
+        return responseBody;
     }
 }
