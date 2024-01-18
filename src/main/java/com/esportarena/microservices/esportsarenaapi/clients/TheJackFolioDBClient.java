@@ -79,4 +79,10 @@ public interface TheJackFolioDBClient {
 
     @PostMapping("/events/update-event-status")
     public ResponseEntity<String> updateEventStatus(@RequestParam String status, @RequestParam String eventName);
+
+    @PostMapping("/games/save-or-update-game")
+    public ResponseEntity<Game> saveOrUpdateGame(@RequestBody Game game);
+
+    @GetMapping("/games/get-active-games")
+    public ResponseEntity<List<Game>> findAllActiveGames();
 }
