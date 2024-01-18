@@ -51,6 +51,7 @@ public class StringConstants {
     public static final String ID_NOT_PRESENT = "Id not present in Database";
     public static final String IS_A_VIEWER = "User is a viewer";
     public static final String NOT_A_VIEWER = "User is not a viewer";
+    public static final String NO_ACTIVE_GAMES = "Currently no active games";
 
     private StringConstants(){}
 
