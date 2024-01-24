@@ -19,6 +19,9 @@ resilience4j:
       get-profile-details-db-retry:
         max-attempts: 3
         wait-duration: 5s
+      is-profile-complete-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
       save-or-update-partner-db-retry:
         max-attempts: 3
         wait-duration: 5s

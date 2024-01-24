@@ -41,6 +41,14 @@ public class ProfileServiceHelper {
         LOGGER.info(StringConstants.VALIDATION_PASSED_DB);
     }
 
+    public boolean isProfileComplete(ProfileDetail detail) {
+        if(StringUtils.isNotBlank(detail.getName()) && StringUtils.isNotEmpty(detail.getName())
+        && StringUtils.isNotBlank(detail.getName()) && StringUtils.isNotEmpty(detail.getName())
+        && StringUtils.isNotBlank(detail.getName()) && StringUtils.isNotEmpty(detail.getName())) {
+            return true;
+        } else return false;
+    }
+
     public void checkPartnerFromUI(Partner partner) throws ValidationException {
         if(Strings.isEmpty(partner.getEmail()) || Strings.isBlank(partner.getEmail()) || Strings.isEmpty(partner.getName()) || Strings.isBlank(partner.getName())) {
             LOGGER.error("Validation failed in ProfileServiceHelper.class : checkProfileDetailsFromUI for object: null");
