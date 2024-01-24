@@ -62,6 +62,25 @@ public class ProfileService {
         }
     }
 
+    public boolean isProfileComplete(String email) throws ValidationException, DataBaseOperationException, MapperException {
+        if(StringUtils.isBlank(email) || StringUtils.isEmpty(email)) {
+            LOGGER.error("Validation failed in ProfileService.class : getProfileDetails for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        } else {
+            ResponseEntity<ProfileDetail> response = dbClient.getProfileDetails(email);
+            ProfileDetail responseBody = response.getBody();
+            validation.checkProfileDetailsFromDB(responseBody);
+            if(responseBody.getMessage().equals(StringConstants.DATABASE_ERROR)){
+                throw new DataBaseOperationException(responseBody.getMessage());
+            }
+            else if(responseBody.getMessage().equals(StringConstants.MAPPING_ERROR)){
+                throw new MapperException(responseBody.getMessage());
+            } else  {
+                return validation.isProfileComplete(responseBody);
+            }
+        }
+    }
+
     public Partner saveOrUpdatePartner(Partner partner) throws ValidationException, DataBaseOperationException, MapperException, FileNotFoundException {
         validation.checkPartnerFromUI(partner);
         ResponseEntity<Partner> response = dbClient.saveOrUpdatePartner(partner);

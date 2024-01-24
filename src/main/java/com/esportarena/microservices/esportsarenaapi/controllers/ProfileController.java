@@ -3,10 +3,7 @@ package com.esportarena.microservices.esportsarenaapi.controllers;
 import com.esportarena.microservices.esportsarenaapi.exceptions.DataBaseOperationException;
 import com.esportarena.microservices.esportsarenaapi.exceptions.MapperException;
 import com.esportarena.microservices.esportsarenaapi.exceptions.ValidationException;
-import com.esportarena.microservices.esportsarenaapi.models.Document;
-import com.esportarena.microservices.esportsarenaapi.models.Partner;
-import com.esportarena.microservices.esportsarenaapi.models.ProfileDetail;
-import com.esportarena.microservices.esportsarenaapi.models.Team;
+import com.esportarena.microservices.esportsarenaapi.models.*;
 import com.esportarena.microservices.esportsarenaapi.services.ProfileService;
 import com.esportarena.microservices.esportsarenaapi.utilities.StringConstants;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -103,6 +100,41 @@ public class ProfileController {
         ProfileDetail detailResponse = new ProfileDetail();
         detailResponse.setMessage(StringConstants.FALLBACK_MESSAGE);
         return ResponseEntity.status(HttpStatus.OK).body(detailResponse);
+    }
+
+    @Operation(
+            summary = "Is Profile Complete",
+            description = "Is Profile complete"
+    )
+    @GetMapping("/is-profile-complete/{email}")
+    @Retry(name = "is-profile-complete-db-retry", fallbackMethod = "isProfileCompleteDbRetry")
+    public ResponseEntity<ProfileCompletionStatus> isProfileComplete(@PathVariable String email) {
+        ProfileCompletionStatus response = new ProfileCompletionStatus();
+        try{
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            boolean isProfileComplete = service.isProfileComplete(email);
+            response.setProfileComplete(isProfileComplete);
+            response.setMessage(StringConstants.REQUEST_PROCESSED);
+        } catch (ValidationException | MapperException | DataBaseOperationException exception) {
+            response.setProfileComplete(true); // setting as true so that user don't see any error
+            response.setMessage(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public ResponseEntity<ProfileCompletionStatus> isProfileCompleteDbRetry(String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        ProfileCompletionStatus response = new ProfileCompletionStatus();
+        response.setMessage(StringConstants.FALLBACK_MESSAGE);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(
