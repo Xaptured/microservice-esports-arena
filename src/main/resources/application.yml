@@ -49,6 +49,9 @@ resilience4j:
       find-upcoming-events-db-retry:
         max-attempts: 3
         wait-duration: 5s
+      find-active-upcoming-events-wrt-interested-games-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
       find-leaderboard-db-retry:
         max-attempts: 3
         wait-duration: 5s

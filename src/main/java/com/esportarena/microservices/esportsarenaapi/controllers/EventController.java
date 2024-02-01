@@ -7,6 +7,7 @@ import com.esportarena.microservices.esportsarenaapi.models.*;
 import com.esportarena.microservices.esportsarenaapi.services.EventService;
 import com.esportarena.microservices.esportsarenaapi.utilities.StringConstants;
 import io.github.resilience4j.retry.annotation.Retry;
+import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
@@ -162,6 +163,39 @@ public class EventController {
     }
 
     public ResponseEntity<List<Event>> findUpcomingEventsDbRetry(String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        Event event = new Event();
+        event.setMessage(StringConstants.FALLBACK_MESSAGE);
+        List<Event> eventsResponse = new ArrayList<>();
+        eventsResponse.add(event);
+        return ResponseEntity.status(HttpStatus.OK).body(eventsResponse);
+    }
+
+    @Operation(
+            summary = "Find upcoming active events with respect to interested games",
+            description = "Find upcoming events with a message which defines whether the request is successful or not."
+    )
+    @GetMapping("/get-upcoming-events-interested-games/{email}")
+    @Retry(name = "find-active-upcoming-events-wrt-interested-games-db-retry", fallbackMethod = "findActiveUpcomingEventsWrtInterestedGamesDbRetry")
+    public ResponseEntity<List<Event>> findActiveUpcomingEventsWrtInterestedGames(@PathVariable String email) {
+        List<Event> eventResults = null;
+        try {
+            if(StringUtils.isEmpty(email) || StringUtils.isBlank(email)) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            eventResults = service.findActiveUpcomingEventsWrtInterestedGames(email);
+        } catch (DataBaseOperationException | MapperException | ValidationException exception) {
+            eventResults = new ArrayList<>();
+            Event event = new Event();
+            event.setMessage(exception.getMessage());
+            eventResults.add(event);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(eventResults);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(eventResults);
+    }
+
+    public ResponseEntity<List<Event>> findActiveUpcomingEventsWrtInterestedGamesDbRetry(String email, Exception exception) {
         isRetryEnabled = false;
         LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
         Event event = new Event();

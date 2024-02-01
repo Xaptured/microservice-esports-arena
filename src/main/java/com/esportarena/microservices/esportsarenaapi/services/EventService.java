@@ -124,6 +124,23 @@ public class EventService {
         }
     }
 
+    public List<Event> findActiveUpcomingEventsWrtInterestedGames(String email) throws ValidationException, DataBaseOperationException, MapperException {
+        if(StringUtils.isBlank(email) || StringUtils.isEmpty(email)) {
+            LOGGER.error("Validation failed in EventService.class : findActiveUpcomingEventsWrtInterestedGames for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        } else {
+            ResponseEntity<List<Event>> response = dbClient.findActiveUpcomingEventsWrtInterestedGames(email);
+            List<Event> responseBody = response.getBody();
+            validation.checkUpComingEventsFromDB(responseBody);
+            if(responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.DATABASE_ERROR)) {
+                throw new DataBaseOperationException(responseBody.get(0).getMessage());
+            } else if(responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.MAPPING_ERROR)) {
+                throw new MapperException(responseBody.get(0).getMessage());
+            }
+            return responseBody;
+        }
+    }
+
     public Event saveOrUpdateEvent(Event event, boolean isCreate, boolean isUpdate) throws ValidationException, DataBaseOperationException, MapperException {
         validation.checkEventFromUI(event);
         ResponseEntity<Event> response = dbClient.saveOrUpdateEvent(event, isCreate, isUpdate);

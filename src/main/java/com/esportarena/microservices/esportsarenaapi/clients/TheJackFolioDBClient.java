@@ -35,6 +35,9 @@ public interface TheJackFolioDBClient {
     @GetMapping("/events/get-upcoming-events/{email}")
     public ResponseEntity<List<Event>> findUpcomingEvents(@PathVariable String email);
 
+    @GetMapping("/events/get-upcoming-events-interested-games/{email}")
+    public ResponseEntity<List<Event>> findActiveUpcomingEventsWrtInterestedGames(@PathVariable String email);
+
     @PostMapping("/events/update-team-status")
     public ResponseEntity<String> updateTeamStatus(@RequestParam String teamName, @RequestParam String teamStatus);
 
