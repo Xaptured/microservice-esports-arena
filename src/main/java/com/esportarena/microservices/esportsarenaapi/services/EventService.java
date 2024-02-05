@@ -131,7 +131,7 @@ public class EventService {
         } else {
             ResponseEntity<List<Event>> response = dbClient.findActiveUpcomingEventsWrtInterestedGames(email);
             List<Event> responseBody = response.getBody();
-            validation.checkUpComingEventsFromDB(responseBody);
+            validation.checkUpComingEventsWrtIntGamesFromDB(responseBody);
             if(responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.DATABASE_ERROR)) {
                 throw new DataBaseOperationException(responseBody.get(0).getMessage());
             } else if(responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.MAPPING_ERROR)) {

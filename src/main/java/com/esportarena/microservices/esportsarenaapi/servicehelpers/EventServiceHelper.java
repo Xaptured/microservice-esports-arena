@@ -83,14 +83,32 @@ public class EventServiceHelper {
     }
 
     public void checkUpComingEventsFromDB(List<Event> events) throws ValidationException {
-        if(events.isEmpty()) {
-            LOGGER.error("Validation failed in EventServiceHelper.class : checkUpComingEventsFromDB for object: null");
-            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        if(events == null || events.isEmpty()) {
+            LOGGER.info("No upcoming active events");
+            throw new ValidationException("No upcoming active events");
         }
         checkDBUpcomingEvents(events);
     }
 
     private void checkDBUpcomingEvents(List<Event> events) throws ValidationException {
+        for(Event event : events) {
+            if(StringUtils.isBlank(event.getName()) || StringUtils.isEmpty(event.getName())) {
+                LOGGER.error("Validation failed in EventServiceHelper.class : checkDBUpcomingEvents for object: null");
+                throw new ValidationException(StringConstants.VALIDATION_ERROR);
+            }
+        }
+        LOGGER.info(StringConstants.VALIDATION_PASSED_DB);
+    }
+
+    public void checkUpComingEventsWrtIntGamesFromDB(List<Event> events) throws ValidationException {
+        if(events == null || events.isEmpty()) {
+            LOGGER.error("No upcoming active events with respect to interested games");
+            throw new ValidationException("No upcoming active events with respect to interested games");
+        }
+        checkDBUpcomingEventsWrtIntGames(events);
+    }
+
+    private void checkDBUpcomingEventsWrtIntGames(List<Event> events) throws ValidationException {
         for(Event event : events) {
             if(StringUtils.isBlank(event.getName()) || StringUtils.isEmpty(event.getName())) {
                 LOGGER.error("Validation failed in EventServiceHelper.class : checkDBUpcomingEvents for object: null");
