@@ -341,6 +341,63 @@ public class EventController {
     }
 
     @Operation(
+            summary = "Get event id",
+            description = "Get event id"
+    )
+    @GetMapping("/get-event-id/{name}")
+    @Retry(name = "get-event-id-db-retry", fallbackMethod = "getEventIdDbRetry")
+    public ResponseEntity<Integer> getEventId(@PathVariable String name) {
+        Integer response = null;
+        try{
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            response = service.getEventId(name);
+        } catch (ValidationException exception){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public ResponseEntity<Integer> getEventIdDbRetry(String name, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    @Operation(
+            summary = "Is registered in event",
+            description = "Is registered in event"
+    )
+    @GetMapping("/is-registered")
+    @Retry(name = "is-registered-event-db-retry", fallbackMethod = "isRegisteredInEventDbRetry")
+    public ResponseEntity<Boolean> isRegisteredInEvent(@RequestParam Integer eventId, @RequestParam String eventName, @RequestParam String email) {
+        Boolean response = false;
+        try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            response = service.isRegisteredInEvent(eventId, eventName, email);
+        } catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public ResponseEntity<Boolean> isRegisteredInEventDbRetry(Integer eventId, String eventName, String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        return ResponseEntity.status(HttpStatus.OK).body(false);
+    }
+
+    @Operation(
             summary = "Save leaderboard",
             description = "Save leaderboard with a message which defines whether the request is successful or not."
     )

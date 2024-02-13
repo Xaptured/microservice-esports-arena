@@ -64,6 +64,12 @@ resilience4j:
       get-event-db-retry:
         max-attempts: 3
         wait-duration: 5s
+      get-event-id-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      is-registered-event-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
       save-leaderboard-db-retry:
         max-attempts: 3
         wait-duration: 5s

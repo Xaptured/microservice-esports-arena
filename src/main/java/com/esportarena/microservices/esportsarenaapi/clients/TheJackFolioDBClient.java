@@ -32,6 +32,12 @@ public interface TheJackFolioDBClient {
     @GetMapping("/events/get-event/{name}")
     public ResponseEntity<Event> getEvent(@PathVariable String name);
 
+    @GetMapping("/events/get-event-id/{name}")
+    public ResponseEntity<Integer> getEventId(@PathVariable String name);
+
+    @GetMapping("/events/is-registered")
+    public ResponseEntity<Boolean> isRegisteredInEvent(@RequestParam Integer eventId, @RequestParam String eventName, @RequestParam String email);
+
     @GetMapping("/events/get-upcoming-events/{email}")
     public ResponseEntity<List<Event>> findUpcomingEvents(@PathVariable String email);
 

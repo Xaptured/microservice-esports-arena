@@ -173,6 +173,28 @@ public class EventService {
         }
     }
 
+    public Integer getEventId(String name) throws ValidationException {
+        if(StringUtils.isBlank(name) || StringUtils.isEmpty(name)) {
+            LOGGER.error("Validation failed in EventService.class : getEventId for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        } else {
+            ResponseEntity<Integer> response = dbClient.getEventId(name);
+            Integer responseBody = response.getBody();
+            return responseBody;
+        }
+    }
+
+    public Boolean isRegisteredInEvent(Integer eventId, String eventName, String email) throws ValidationException {
+        if(eventId == null && (StringUtils.isBlank(eventName) || StringUtils.isEmpty(eventName))) {
+            LOGGER.error("Validation failed in EventService.class : isRegisteredInEvent for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        } else {
+            ResponseEntity<Boolean> response = dbClient.isRegisteredInEvent(eventId, eventName, email);
+            Boolean responseBody = response.getBody();
+            return responseBody;
+        }
+    }
+
     public Leaderboard saveLeaderboard(Leaderboard leaderboard) throws ValidationException, DataBaseOperationException, MapperException {
         validation.checkLeaderboardFromUI(leaderboard);
         ResponseEntity<Leaderboard> response = dbClient.saveLeaderboard(leaderboard);
