@@ -70,6 +70,12 @@ resilience4j:
       is-registered-event-db-retry:
         max-attempts: 3
         wait-duration: 5s
+      get-remaining-players-per-slot-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      get-team-details-for-event-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
       save-leaderboard-db-retry:
         max-attempts: 3
         wait-duration: 5s

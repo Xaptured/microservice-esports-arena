@@ -38,6 +38,12 @@ public interface TheJackFolioDBClient {
     @GetMapping("/events/is-registered")
     public ResponseEntity<Boolean> isRegisteredInEvent(@RequestParam Integer eventId, @RequestParam String eventName, @RequestParam String email);
 
+    @GetMapping("/events/get-team-details-for-event")
+    public ResponseEntity<List<ProfileDetail>> getTeamDetailsForEvent(@RequestParam Integer eventId, @RequestParam String eventName, @RequestParam String email);
+
+    @GetMapping("/events/get-remaining-players-per-slot")
+    public ResponseEntity<Integer> remainingPlayersPerSlotCount(@RequestParam Integer eventId, @RequestParam String eventName, @RequestParam String email);
+
     @GetMapping("/events/get-upcoming-events/{email}")
     public ResponseEntity<List<Event>> findUpcomingEvents(@PathVariable String email);
 

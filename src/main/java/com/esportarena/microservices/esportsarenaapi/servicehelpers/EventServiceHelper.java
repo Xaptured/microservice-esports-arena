@@ -181,4 +181,12 @@ public class EventServiceHelper {
         }
         LOGGER.info(StringConstants.VALIDATION_PASSED_UI);
     }
+
+    public void checkEventIdEmailEventNameFromUI(Integer eventId, String email, String eventName) throws ValidationException {
+        if(StringUtils.isBlank(email) || StringUtils.isEmpty(email) || StringUtils.isBlank(eventName) || StringUtils.isEmpty(eventName) || eventId == null) {
+            LOGGER.error("Validation failed in EventServiceHelper.class : checkEventIdEmailEventNameFromUI for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        }
+        LOGGER.info(StringConstants.VALIDATION_PASSED_UI);
+    }
 }

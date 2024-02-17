@@ -11,8 +11,10 @@ import io.micrometer.common.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -192,6 +194,28 @@ public class EventService {
             ResponseEntity<Boolean> response = dbClient.isRegisteredInEvent(eventId, eventName, email);
             Boolean responseBody = response.getBody();
             return responseBody;
+        }
+    }
+
+    public List<ProfileDetail> getTeamDetailsForEvent(Integer eventId, String eventName, String email) throws ValidationException {
+        validation.checkEventIdEmailEventNameFromUI(eventId, email, eventName);
+        ResponseEntity<List<ProfileDetail>> response = dbClient.getTeamDetailsForEvent(eventId, eventName, email);
+        if(response.getStatusCode().is2xxSuccessful()) {
+            List<ProfileDetail> responseBody = response.getBody();
+            return responseBody;
+        } else {
+            throw new ValidationException(StringConstants.FALLBACK_MESSAGE);
+        }
+    }
+
+    public Integer remainingPlayersPerSlotCount(Integer eventId, String eventName, String email) throws ValidationException {
+        validation.checkEventIdEmailEventNameFromUI(eventId, email, eventName);
+        ResponseEntity<Integer> response = dbClient.remainingPlayersPerSlotCount(eventId, eventName, email);
+        if(response.getStatusCode().is2xxSuccessful()) {
+            Integer responseBody = response.getBody();
+            return responseBody;
+        } else {
+            throw new ValidationException(StringConstants.FALLBACK_MESSAGE);
         }
     }
 
