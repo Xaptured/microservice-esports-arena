@@ -174,9 +174,9 @@ public class EventServiceHelper {
         LOGGER.info(StringConstants.VALIDATION_PASSED_DB);
     }
 
-    public void checkEmailAndIdForViewerFromUI(String email, Integer eventId) throws ValidationException {
-        if(StringUtils.isBlank(email) || StringUtils.isEmpty(email) || eventId == null) {
-            LOGGER.error("Validation failed in EventServiceHelper.class : checkEmailAndIdForViewerFromUI for object: null");
+    public void checkEmailAndEventNameFromUI(String eventName, Integer eventId) throws ValidationException {
+        if(StringUtils.isBlank(eventName) || StringUtils.isEmpty(eventName) || eventId == null) {
+            LOGGER.error("Validation failed in EventServiceHelper.class : checkEmailAndEventNameFromUI for object: null");
             throw new ValidationException(StringConstants.VALIDATION_ERROR);
         }
         LOGGER.info(StringConstants.VALIDATION_PASSED_UI);

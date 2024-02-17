@@ -219,6 +219,17 @@ public class EventService {
         }
     }
 
+    public List<TeamWithCount> getTeamsWithCount(Integer eventId, String eventName) throws ValidationException {
+        validation.checkEventIdAndEmailFromUI(eventId, eventName);
+        ResponseEntity<List<TeamWithCount>> response = dbClient.getTeamsWithCount(eventId, eventName);
+        if(response.getStatusCode().is2xxSuccessful()) {
+            List<TeamWithCount> responseBody = response.getBody();
+            return responseBody;
+        } else {
+            throw new ValidationException(StringConstants.FALLBACK_MESSAGE);
+        }
+    }
+
     public Leaderboard saveLeaderboard(Leaderboard leaderboard) throws ValidationException, DataBaseOperationException, MapperException {
         validation.checkLeaderboardFromUI(leaderboard);
         ResponseEntity<Leaderboard> response = dbClient.saveLeaderboard(leaderboard);
@@ -276,7 +287,7 @@ public class EventService {
     }
 
     public Viewer isViewer(String email, Integer eventId) throws ValidationException, DataBaseOperationException {
-        validation.checkEmailAndIdForViewerFromUI(email, eventId);
+        validation.checkEventIdAndEmailFromUI(eventId, email);
         ResponseEntity<Viewer> response = dbClient.isViewer(email, eventId);
         Viewer responseBody = response.getBody();
         if(responseBody.getMessage().equals(StringConstants.DATABASE_ERROR)){

@@ -461,6 +461,21 @@ public class EventController {
     }
 
     @Operation(
+            summary = "Get team names with counts",
+            description = "Get team names with counts"
+    )
+    @GetMapping("/get-teams-with-count")
+    public ResponseEntity<List<TeamWithCount>> getTeamsWithCount(@RequestParam Integer eventId, @RequestParam String eventName) {
+        List<TeamWithCount> response = null;
+        try {
+            response = service.getTeamsWithCount(eventId, eventName);
+        } catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Operation(
             summary = "Save leaderboard",
             description = "Save leaderboard with a message which defines whether the request is successful or not."
     )
