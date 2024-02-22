@@ -20,6 +20,9 @@ public interface TheJackFolioDBClient {
     @GetMapping("/clients/get-profile/{email}")
     public ResponseEntity<ProfileDetail> getProfileDetails(@PathVariable String email);
 
+    @GetMapping("/clients/is-profile-present/{email}")
+    public ResponseEntity<Boolean> isProfilePresent(@PathVariable String email);
+
     @PostMapping("/events/save-team")
     public ResponseEntity<Team> saveOrUpdateTeam(@RequestBody Team team, @RequestParam boolean isCreate, @RequestParam boolean isUpdate);
 

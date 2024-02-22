@@ -62,6 +62,22 @@ public class ProfileService {
         }
     }
 
+    public Boolean isProfilePresent(String email) throws ValidationException {
+        Boolean responseBody = false;
+        if(StringUtils.isBlank(email) || StringUtils.isEmpty(email)) {
+            LOGGER.error("Validation failed in ProfileService.class : getProfileDetails for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        } else {
+            ResponseEntity<Boolean> response = dbClient.isProfilePresent(email);
+            if(response.getStatusCode().is2xxSuccessful()) {
+                responseBody = response.getBody();
+            } else {
+                throw new ValidationException(StringConstants.FALLBACK_MESSAGE);
+            }
+        }
+        return responseBody;
+    }
+
     public boolean isProfileComplete(String email) throws ValidationException, DataBaseOperationException, MapperException {
         if(StringUtils.isBlank(email) || StringUtils.isEmpty(email)) {
             LOGGER.error("Validation failed in ProfileService.class : getProfileDetails for object: null");
