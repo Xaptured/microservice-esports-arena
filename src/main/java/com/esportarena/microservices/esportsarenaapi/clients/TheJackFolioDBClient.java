@@ -20,6 +20,9 @@ public interface TheJackFolioDBClient {
     @GetMapping("/clients/get-profile/{email}")
     public ResponseEntity<ProfileDetail> getProfileDetails(@PathVariable String email);
 
+    @GetMapping("/clients/is-profile-present/{email}")
+    public ResponseEntity<Boolean> isProfilePresent(@PathVariable String email);
+
     @PostMapping("/events/save-team")
     public ResponseEntity<Team> saveOrUpdateTeam(@RequestBody Team team, @RequestParam boolean isCreate, @RequestParam boolean isUpdate);
 
@@ -32,8 +35,26 @@ public interface TheJackFolioDBClient {
     @GetMapping("/events/get-event/{name}")
     public ResponseEntity<Event> getEvent(@PathVariable String name);
 
+    @GetMapping("/events/get-event-id/{name}")
+    public ResponseEntity<Integer> getEventId(@PathVariable String name);
+
+    @GetMapping("/events/is-registered")
+    public ResponseEntity<Boolean> isRegisteredInEvent(@RequestParam Integer eventId, @RequestParam String eventName, @RequestParam String email);
+
+    @GetMapping("/events/get-team-details-for-event")
+    public ResponseEntity<List<ProfileDetail>> getTeamDetailsForEvent(@RequestParam Integer eventId, @RequestParam String eventName, @RequestParam String email);
+
+    @GetMapping("/events/get-remaining-players-per-slot")
+    public ResponseEntity<Integer> remainingPlayersPerSlotCount(@RequestParam Integer eventId, @RequestParam String eventName, @RequestParam String email);
+
+    @GetMapping("/events/get-teams-with-count")
+    public ResponseEntity<List<TeamWithCount>> getTeamsWithCount(@RequestParam Integer eventId, @RequestParam String eventName);
+
     @GetMapping("/events/get-upcoming-events/{email}")
     public ResponseEntity<List<Event>> findUpcomingEvents(@PathVariable String email);
+
+    @GetMapping("/events/get-upcoming-events-interested-games/{email}")
+    public ResponseEntity<List<Event>> findActiveUpcomingEventsWrtInterestedGames(@PathVariable String email);
 
     @PostMapping("/events/update-team-status")
     public ResponseEntity<String> updateTeamStatus(@RequestParam String teamName, @RequestParam String teamStatus);

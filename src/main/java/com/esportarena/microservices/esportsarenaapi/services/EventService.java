@@ -11,8 +11,10 @@ import io.micrometer.common.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -124,6 +126,23 @@ public class EventService {
         }
     }
 
+    public List<Event> findActiveUpcomingEventsWrtInterestedGames(String email) throws ValidationException, DataBaseOperationException, MapperException {
+        if(StringUtils.isBlank(email) || StringUtils.isEmpty(email)) {
+            LOGGER.error("Validation failed in EventService.class : findActiveUpcomingEventsWrtInterestedGames for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        } else {
+            ResponseEntity<List<Event>> response = dbClient.findActiveUpcomingEventsWrtInterestedGames(email);
+            List<Event> responseBody = response.getBody();
+            validation.checkUpComingEventsWrtIntGamesFromDB(responseBody);
+            if(responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.DATABASE_ERROR)) {
+                throw new DataBaseOperationException(responseBody.get(0).getMessage());
+            } else if(responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.MAPPING_ERROR)) {
+                throw new MapperException(responseBody.get(0).getMessage());
+            }
+            return responseBody;
+        }
+    }
+
     public Event saveOrUpdateEvent(Event event, boolean isCreate, boolean isUpdate) throws ValidationException, DataBaseOperationException, MapperException {
         validation.checkEventFromUI(event);
         ResponseEntity<Event> response = dbClient.saveOrUpdateEvent(event, isCreate, isUpdate);
@@ -153,6 +172,61 @@ public class EventService {
                 throw new MapperException(responseBody.getMessage());
             }
             return responseBody;
+        }
+    }
+
+    public Integer getEventId(String name) throws ValidationException {
+        if(StringUtils.isBlank(name) || StringUtils.isEmpty(name)) {
+            LOGGER.error("Validation failed in EventService.class : getEventId for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        } else {
+            ResponseEntity<Integer> response = dbClient.getEventId(name);
+            Integer responseBody = response.getBody();
+            return responseBody;
+        }
+    }
+
+    public Boolean isRegisteredInEvent(Integer eventId, String eventName, String email) throws ValidationException {
+        if(eventId == null && (StringUtils.isBlank(eventName) || StringUtils.isEmpty(eventName))) {
+            LOGGER.error("Validation failed in EventService.class : isRegisteredInEvent for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        } else {
+            ResponseEntity<Boolean> response = dbClient.isRegisteredInEvent(eventId, eventName, email);
+            Boolean responseBody = response.getBody();
+            return responseBody;
+        }
+    }
+
+    public List<ProfileDetail> getTeamDetailsForEvent(Integer eventId, String eventName, String email) throws ValidationException {
+        validation.checkEventIdEmailEventNameFromUI(eventId, email, eventName);
+        ResponseEntity<List<ProfileDetail>> response = dbClient.getTeamDetailsForEvent(eventId, eventName, email);
+        if(response.getStatusCode().is2xxSuccessful()) {
+            List<ProfileDetail> responseBody = response.getBody();
+            return responseBody;
+        } else {
+            throw new ValidationException(StringConstants.FALLBACK_MESSAGE);
+        }
+    }
+
+    public Integer remainingPlayersPerSlotCount(Integer eventId, String eventName, String email) throws ValidationException {
+        validation.checkEventIdEmailEventNameFromUI(eventId, email, eventName);
+        ResponseEntity<Integer> response = dbClient.remainingPlayersPerSlotCount(eventId, eventName, email);
+        if(response.getStatusCode().is2xxSuccessful()) {
+            Integer responseBody = response.getBody();
+            return responseBody;
+        } else {
+            throw new ValidationException(StringConstants.FALLBACK_MESSAGE);
+        }
+    }
+
+    public List<TeamWithCount> getTeamsWithCount(Integer eventId, String eventName) throws ValidationException {
+        validation.checkEventIdAndEmailFromUI(eventId, eventName);
+        ResponseEntity<List<TeamWithCount>> response = dbClient.getTeamsWithCount(eventId, eventName);
+        if(response.getStatusCode().is2xxSuccessful()) {
+            List<TeamWithCount> responseBody = response.getBody();
+            return responseBody;
+        } else {
+            throw new ValidationException(StringConstants.FALLBACK_MESSAGE);
         }
     }
 
@@ -213,7 +287,7 @@ public class EventService {
     }
 
     public Viewer isViewer(String email, Integer eventId) throws ValidationException, DataBaseOperationException {
-        validation.checkEmailAndIdForViewerFromUI(email, eventId);
+        validation.checkEventIdAndEmailFromUI(eventId, email);
         ResponseEntity<Viewer> response = dbClient.isViewer(email, eventId);
         Viewer responseBody = response.getBody();
         if(responseBody.getMessage().equals(StringConstants.DATABASE_ERROR)){

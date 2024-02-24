@@ -103,6 +103,35 @@ public class ProfileController {
     }
 
     @Operation(
+            summary = "Is profile present",
+            description = "Is profile present"
+    )
+    @GetMapping("/is-profile-present/{email}")
+    @Retry(name = "is-profile-present-db-retry", fallbackMethod = "isProfilePresentDbRetry")
+    public ResponseEntity<Boolean> isProfilePresent(@PathVariable String email) {
+        boolean response = false;
+        try{
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            response = service.isProfilePresent(email);
+        } catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public ResponseEntity<Boolean> isProfilePresentDbRetry(String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        return ResponseEntity.status(HttpStatus.OK).body(false);
+    }
+
+    @Operation(
             summary = "Is Profile Complete",
             description = "Is Profile complete"
     )

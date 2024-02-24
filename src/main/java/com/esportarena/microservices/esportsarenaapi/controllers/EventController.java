@@ -7,6 +7,7 @@ import com.esportarena.microservices.esportsarenaapi.models.*;
 import com.esportarena.microservices.esportsarenaapi.services.EventService;
 import com.esportarena.microservices.esportsarenaapi.utilities.StringConstants;
 import io.github.resilience4j.retry.annotation.Retry;
+import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
@@ -172,6 +173,39 @@ public class EventController {
     }
 
     @Operation(
+            summary = "Find upcoming active events with respect to interested games",
+            description = "Find upcoming events with a message which defines whether the request is successful or not."
+    )
+    @GetMapping("/get-upcoming-events-interested-games/{email}")
+    @Retry(name = "find-active-upcoming-events-wrt-interested-games-db-retry", fallbackMethod = "findActiveUpcomingEventsWrtInterestedGamesDbRetry")
+    public ResponseEntity<List<Event>> findActiveUpcomingEventsWrtInterestedGames(@PathVariable String email) {
+        List<Event> eventResults = null;
+        try {
+            if(StringUtils.isEmpty(email) || StringUtils.isBlank(email)) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            eventResults = service.findActiveUpcomingEventsWrtInterestedGames(email);
+        } catch (DataBaseOperationException | MapperException | ValidationException exception) {
+            eventResults = new ArrayList<>();
+            Event event = new Event();
+            event.setMessage(exception.getMessage());
+            eventResults.add(event);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(eventResults);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(eventResults);
+    }
+
+    public ResponseEntity<List<Event>> findActiveUpcomingEventsWrtInterestedGamesDbRetry(String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        Event event = new Event();
+        event.setMessage(StringConstants.FALLBACK_MESSAGE);
+        List<Event> eventsResponse = new ArrayList<>();
+        eventsResponse.add(event);
+        return ResponseEntity.status(HttpStatus.OK).body(eventsResponse);
+    }
+
+    @Operation(
             summary = "Get leaderboard",
             description = "Get leaderboard with a message which defines whether the request is successful or not."
     )
@@ -304,6 +338,141 @@ public class EventController {
         Event eventResponse = new Event();
         eventResponse.setMessage(StringConstants.FALLBACK_MESSAGE);
         return ResponseEntity.status(HttpStatus.OK).body(eventResponse);
+    }
+
+    @Operation(
+            summary = "Get event id",
+            description = "Get event id"
+    )
+    @GetMapping("/get-event-id/{name}")
+    @Retry(name = "get-event-id-db-retry", fallbackMethod = "getEventIdDbRetry")
+    public ResponseEntity<Integer> getEventId(@PathVariable String name) {
+        Integer response = null;
+        try{
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            response = service.getEventId(name);
+        } catch (ValidationException exception){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public ResponseEntity<Integer> getEventIdDbRetry(String name, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    @Operation(
+            summary = "Is registered in event",
+            description = "Is registered in event"
+    )
+    @GetMapping("/is-registered")
+    @Retry(name = "is-registered-event-db-retry", fallbackMethod = "isRegisteredInEventDbRetry")
+    public ResponseEntity<Boolean> isRegisteredInEvent(@RequestParam Integer eventId, @RequestParam String eventName, @RequestParam String email) {
+        Boolean response = false;
+        try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            response = service.isRegisteredInEvent(eventId, eventName, email);
+        } catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public ResponseEntity<Boolean> isRegisteredInEventDbRetry(Integer eventId, String eventName, String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        return ResponseEntity.status(HttpStatus.OK).body(false);
+    }
+
+    @Operation(
+            summary = "Get team details for an event",
+            description = "Get team details for an event"
+    )
+    @GetMapping("/get-team-details-for-event")
+    @Retry(name = "get-team-details-for-event-db-retry", fallbackMethod = "getTeamDetailsForEventDbRetry")
+    public ResponseEntity<List<ProfileDetail>> getTeamDetailsForEvent(@RequestParam Integer eventId, @RequestParam String eventName, @RequestParam String email) {
+        List<ProfileDetail> response = null;
+        try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            response = service.getTeamDetailsForEvent(eventId, eventName, email);
+        } catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public ResponseEntity<List<ProfileDetail>> getTeamDetailsForEventDbRetry(Integer eventId, String eventName, String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        ProfileDetail profileDetail = new ProfileDetail();
+        profileDetail.setMessage(StringConstants.FALLBACK_MESSAGE);
+        List<ProfileDetail> profileDetails = new ArrayList<>();
+        profileDetails.add(profileDetail);
+        return ResponseEntity.status(HttpStatus.OK).body(profileDetails);
+    }
+
+    @Operation(
+            summary = "Get remaining players per slot",
+            description = "Get remaining players per slot"
+    )
+    @GetMapping("/get-remaining-players-per-slot")
+    @Retry(name = "get-remaining-players-per-slot-db-retry", fallbackMethod = "remainingPlayersPerSlotCountDbRetry")
+    public ResponseEntity<Integer> remainingPlayersPerSlotCount(@RequestParam Integer eventId, @RequestParam String eventName, @RequestParam String email) {
+        Integer response = null;
+        try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            response = service.remainingPlayersPerSlotCount(eventId, eventName, email);
+        } catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public ResponseEntity<Integer> remainingPlayersPerSlotCountDbRetry(Integer eventId, String eventName, String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        return ResponseEntity.status(HttpStatus.OK).body(0);
+    }
+
+    @Operation(
+            summary = "Get team names with counts",
+            description = "Get team names with counts"
+    )
+    @GetMapping("/get-teams-with-count")
+    public ResponseEntity<List<TeamWithCount>> getTeamsWithCount(@RequestParam Integer eventId, @RequestParam String eventName) {
+        List<TeamWithCount> response = null;
+        try {
+            response = service.getTeamsWithCount(eventId, eventName);
+        } catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @Operation(
