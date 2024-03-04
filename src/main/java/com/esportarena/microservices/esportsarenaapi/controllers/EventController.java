@@ -181,6 +181,12 @@ public class EventController {
     public ResponseEntity<List<Event>> findActiveUpcomingEventsWrtInterestedGames(@PathVariable String email) {
         List<Event> eventResults = null;
         try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
             if(StringUtils.isEmpty(email) || StringUtils.isBlank(email)) {
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
@@ -192,10 +198,51 @@ public class EventController {
             eventResults.add(event);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(eventResults);
         }
+        isRetryEnabled = false;
         return ResponseEntity.status(HttpStatus.OK).body(eventResults);
     }
 
     public ResponseEntity<List<Event>> findActiveUpcomingEventsWrtInterestedGamesDbRetry(String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        Event event = new Event();
+        event.setMessage(StringConstants.FALLBACK_MESSAGE);
+        List<Event> eventsResponse = new ArrayList<>();
+        eventsResponse.add(event);
+        return ResponseEntity.status(HttpStatus.OK).body(eventsResponse);
+    }
+
+    @Operation(
+            summary = "Find upcoming events for an organizer",
+            description = "Find upcoming events for an organizer with a message which defines whether the request is successful or not."
+    )
+    @GetMapping("/get-upcoming-organizer-events/{email}")
+    @Retry(name = "get-upcoming-organizer-events-db-retry", fallbackMethod = "findAllUpcomingOrganizerEventsDbRetry")
+    public ResponseEntity<List<Event>> findAllUpcomingOrganizerEvents(@PathVariable String email) {
+        List<Event> eventResults = null;
+        try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            if(StringUtils.isEmpty(email) || StringUtils.isBlank(email)) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            eventResults = service.findAllUpcomingOrganizerEvents(email);
+        } catch (DataBaseOperationException | MapperException | ValidationException exception) {
+            eventResults = new ArrayList<>();
+            Event event = new Event();
+            event.setMessage(exception.getMessage());
+            eventResults.add(event);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(eventResults);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(eventResults);
+    }
+
+    public ResponseEntity<List<Event>> findAllUpcomingOrganizerEventsDbRetry(String email, Exception exception) {
         isRetryEnabled = false;
         LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
         Event event = new Event();
