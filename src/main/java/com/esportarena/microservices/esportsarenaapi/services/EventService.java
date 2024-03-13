@@ -286,6 +286,20 @@ public class EventService {
         }
     }
 
+    public boolean isLeaderboardComplete(Integer eventId) throws ValidationException {
+        if(eventId == null) {
+            LOGGER.error("Validation failed in EventService.class : isLeaderboardComplete for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        } else {
+            ResponseEntity<Boolean> response = dbClient.isLeaderboardComplete(eventId);
+            if(response.getStatusCode().is2xxSuccessful()) {
+                return Boolean.TRUE.equals(response.getBody());
+            } else {
+                throw new ValidationException(StringConstants.FALLBACK_MESSAGE);
+            }
+        }
+    }
+
     public byte[] generateExcelSheetForTeams(Integer eventId) {
         if(eventId != null) {
             ResponseEntity<byte[]> response = dbClient.generateExcel(eventId);

@@ -68,6 +68,9 @@ public interface TheJackFolioDBClient {
     @RequestMapping(path = "/events/save-documents/{eventId}", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Leaderboard> saveLeaderboardDocument(@RequestPart MultipartFile doc, @PathVariable Integer eventId);
 
+    @GetMapping("/events/is-leaderboard-complete/{eventId}")
+    public ResponseEntity<Boolean> isLeaderboardComplete(@PathVariable Integer eventId);
+
     @GetMapping("/events/create-sheet/{eventId}")
     public ResponseEntity<byte[]> generateExcel(@PathVariable Integer eventId);
 

@@ -85,6 +85,9 @@ resilience4j:
       save-leaderboard-document-db-retry:
         max-attempts: 3
         wait-duration: 5s
+      is-leaderboard-complete-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
       generate-excel-db-retry:
         max-attempts: 3
         wait-duration: 5s

@@ -590,6 +590,35 @@ public class EventController {
     }
 
     @Operation(
+            summary = "Is leaderboard complete",
+            description = "Is leaderboard complete"
+    )
+    @GetMapping("/is-leaderboard-complete/{eventId}")
+    @Retry(name = "is-leaderboard-complete-db-retry", fallbackMethod = "isLeaderboardCompleteDbRetry")
+    public ResponseEntity<Boolean> isLeaderboardComplete(@PathVariable Integer eventId) {
+        boolean isLeaderboardComplete = false;
+        try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            isLeaderboardComplete = service.isLeaderboardComplete(eventId);
+        } catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(isLeaderboardComplete);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(isLeaderboardComplete);
+    }
+
+    public ResponseEntity<Boolean> isLeaderboardCompleteDbRetry(Integer eventId, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        return ResponseEntity.status(HttpStatus.OK).body(false);
+    }
+
+    @Operation(
             summary = "Get team's document",
             description = "Get team's document and gives the response with a message which defines whether the request is successful or not."
     )
