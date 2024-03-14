@@ -56,6 +56,9 @@ public interface TheJackFolioDBClient {
     @GetMapping("/events/get-upcoming-events-interested-games/{email}")
     public ResponseEntity<List<Event>> findActiveUpcomingEventsWrtInterestedGames(@PathVariable String email);
 
+    @GetMapping("/events/get-upcoming-organizer-events/{email}")
+    public ResponseEntity<List<Event>> findAllUpcomingOrganizerEvents(@PathVariable String email);
+
     @PostMapping("/events/update-team-status")
     public ResponseEntity<String> updateTeamStatus(@RequestParam String teamName, @RequestParam String teamStatus);
 
@@ -64,6 +67,9 @@ public interface TheJackFolioDBClient {
 
     @RequestMapping(path = "/events/save-documents/{eventId}", method = POST, consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<Leaderboard> saveLeaderboardDocument(@RequestPart MultipartFile doc, @PathVariable Integer eventId);
+
+    @GetMapping("/events/is-leaderboard-complete/{eventId}")
+    public ResponseEntity<Boolean> isLeaderboardComplete(@PathVariable Integer eventId);
 
     @GetMapping("/events/create-sheet/{eventId}")
     public ResponseEntity<byte[]> generateExcel(@PathVariable Integer eventId);

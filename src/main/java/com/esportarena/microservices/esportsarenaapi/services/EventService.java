@@ -143,6 +143,29 @@ public class EventService {
         }
     }
 
+    public List<Event> findAllUpcomingOrganizerEvents(String email) throws ValidationException, DataBaseOperationException, MapperException {
+        List<Event> responseBody = null;
+        if(StringUtils.isBlank(email) || StringUtils.isEmpty(email)) {
+            LOGGER.error("Validation failed in EventService.class : findAllUpcomingOrganizerEvents for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        } else {
+            ResponseEntity<List<Event>> response = dbClient.findAllUpcomingOrganizerEvents(email);
+            if(response.getStatusCode().is2xxSuccessful()) {
+                responseBody = response.getBody();
+                validation.checkUpComingEventsWrtIntGamesFromDB(responseBody);
+                return responseBody;
+            } else {
+                responseBody = response.getBody();
+                if(responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.DATABASE_ERROR)) {
+                    throw new DataBaseOperationException(responseBody.get(0).getMessage());
+                } else if(responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.MAPPING_ERROR)) {
+                    throw new MapperException(responseBody.get(0).getMessage());
+                }
+            }
+        }
+        return responseBody;
+    }
+
     public Event saveOrUpdateEvent(Event event, boolean isCreate, boolean isUpdate) throws ValidationException, DataBaseOperationException, MapperException {
         validation.checkEventFromUI(event);
         ResponseEntity<Event> response = dbClient.saveOrUpdateEvent(event, isCreate, isUpdate);
@@ -260,6 +283,20 @@ public class EventService {
             throw new IOException(StringConstants.IO_ERROR);
         } else {
             return responseBody;
+        }
+    }
+
+    public boolean isLeaderboardComplete(Integer eventId) throws ValidationException {
+        if(eventId == null) {
+            LOGGER.error("Validation failed in EventService.class : isLeaderboardComplete for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        } else {
+            ResponseEntity<Boolean> response = dbClient.isLeaderboardComplete(eventId);
+            if(response.getStatusCode().is2xxSuccessful()) {
+                return Boolean.TRUE.equals(response.getBody());
+            } else {
+                throw new ValidationException(StringConstants.FALLBACK_MESSAGE);
+            }
         }
     }
 
