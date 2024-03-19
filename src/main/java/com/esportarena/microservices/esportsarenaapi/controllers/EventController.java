@@ -253,6 +253,86 @@ public class EventController {
     }
 
     @Operation(
+            summary = "Find completed events for an organizer",
+            description = "Find completed events for an organizer."
+    )
+    @GetMapping("/get-completed-events-organizer/{email}")
+    @Retry(name = "get-completed-events-organizer-db-retry", fallbackMethod = "findAllLeaderboardCompleteOrganizerEventsDbRetry")
+    public ResponseEntity<List<Event>> findAllLeaderboardCompleteOrganizerEvents(@PathVariable String email) {
+        List<Event> eventResults = null;
+        try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            if(StringUtils.isEmpty(email) || StringUtils.isBlank(email)) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            eventResults = service.findAllLeaderboardCompleteOrganizerEvents(email);
+        } catch (DataBaseOperationException | MapperException | ValidationException exception) {
+            eventResults = new ArrayList<>();
+            Event event = new Event();
+            event.setMessage(exception.getMessage());
+            eventResults.add(event);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(eventResults);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(eventResults);
+    }
+
+    public ResponseEntity<List<Event>> findAllLeaderboardCompleteOrganizerEventsDbRetry(String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        Event event = new Event();
+        event.setMessage(StringConstants.FALLBACK_MESSAGE);
+        List<Event> eventsResponse = new ArrayList<>();
+        eventsResponse.add(event);
+        return ResponseEntity.status(HttpStatus.OK).body(eventsResponse);
+    }
+
+    @Operation(
+            summary = "Find completed events for an participant",
+            description = "Find completed events for an participant."
+    )
+    @GetMapping("/get-completed-events-participant/{email}")
+    @Retry(name = "get-completed-events-participant-db-retry", fallbackMethod = "findAllLeaderboardCompleteParticipantEventsDbRetry")
+    public ResponseEntity<List<Event>> findAllLeaderboardCompleteParticipantEvents(@PathVariable String email) {
+        List<Event> eventResults = null;
+        try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            if(StringUtils.isEmpty(email) || StringUtils.isBlank(email)) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            eventResults = service.findAllLeaderboardCompleteParticipantEvents(email);
+        } catch (DataBaseOperationException | MapperException | ValidationException exception) {
+            eventResults = new ArrayList<>();
+            Event event = new Event();
+            event.setMessage(exception.getMessage());
+            eventResults.add(event);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(eventResults);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(eventResults);
+    }
+
+    public ResponseEntity<List<Event>> findAllLeaderboardCompleteParticipantEventsDbRetry(String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        Event event = new Event();
+        event.setMessage(StringConstants.FALLBACK_MESSAGE);
+        List<Event> eventsResponse = new ArrayList<>();
+        eventsResponse.add(event);
+        return ResponseEntity.status(HttpStatus.OK).body(eventsResponse);
+    }
+
+    @Operation(
             summary = "Get leaderboard",
             description = "Get leaderboard with a message which defines whether the request is successful or not."
     )
@@ -641,6 +721,38 @@ public class EventController {
     }
 
     public ResponseEntity<byte[]> generateExcelDbRetry(Integer eventId, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    @Operation(
+            summary = "Get Teams with points",
+            description = "Get Teams with points"
+    )
+    @GetMapping("/get-teams-with-points/{eventId}")
+    @Retry(name = "get-teams-with-points-db-retry", fallbackMethod = "findTeamsWithPointsDbRetry")
+    public ResponseEntity<List<TeamWithPoints>> findTeamsWithPoints(@PathVariable Integer eventId) {
+        List<TeamWithPoints> teamWithPoints = null;
+        try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            if(eventId == null) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            teamWithPoints = service.findTeamsWithPoints(eventId);
+        } catch (ValidationException exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(teamWithPoints);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(teamWithPoints);
+    }
+
+    public ResponseEntity<List<TeamWithPoints>> findTeamsWithPointsDbRetry(Integer eventId, Exception exception) {
         isRetryEnabled = false;
         LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
         return ResponseEntity.status(HttpStatus.OK).body(null);

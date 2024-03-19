@@ -55,6 +55,12 @@ resilience4j:
       get-upcoming-organizer-events-db-retry:
         max-attempts: 3
         wait-duration: 5s
+      get-completed-events-organizer-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      get-completed-events-participant-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
       find-leaderboard-db-retry:
         max-attempts: 3
         wait-duration: 5s
@@ -89,6 +95,9 @@ resilience4j:
         max-attempts: 3
         wait-duration: 5s
       generate-excel-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      get-teams-with-points-db-retry:
         max-attempts: 3
         wait-duration: 5s
       save-viewer-db-retry:

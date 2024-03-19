@@ -166,6 +166,52 @@ public class EventService {
         return responseBody;
     }
 
+    public List<Event> findAllLeaderboardCompleteOrganizerEvents(String email) throws ValidationException, DataBaseOperationException, MapperException {
+        List<Event> responseBody = null;
+        if(StringUtils.isBlank(email) || StringUtils.isEmpty(email)) {
+            LOGGER.error("Validation failed in EventService.class : findAllUpcomingOrganizerEvents for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        } else {
+            ResponseEntity<List<Event>> response = dbClient.findAllLeaderboardCompleteOrganizerEvents(email);
+            if(response.getStatusCode().is2xxSuccessful()) {
+                responseBody = response.getBody();
+                validation.checkUpComingEventsWrtIntGamesFromDB(responseBody);
+                return responseBody;
+            } else {
+                responseBody = response.getBody();
+                if(responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.DATABASE_ERROR)) {
+                    throw new DataBaseOperationException(responseBody.get(0).getMessage());
+                } else if(responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.MAPPING_ERROR)) {
+                    throw new MapperException(responseBody.get(0).getMessage());
+                }
+            }
+        }
+        return responseBody;
+    }
+
+    public List<Event> findAllLeaderboardCompleteParticipantEvents(String email) throws ValidationException, DataBaseOperationException, MapperException {
+        List<Event> responseBody = null;
+        if(StringUtils.isBlank(email) || StringUtils.isEmpty(email)) {
+            LOGGER.error("Validation failed in EventService.class : findAllUpcomingOrganizerEvents for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        } else {
+            ResponseEntity<List<Event>> response = dbClient.findAllLeaderboardCompleteParticipantEvents(email);
+            if(response.getStatusCode().is2xxSuccessful()) {
+                responseBody = response.getBody();
+                validation.checkUpComingEventsWrtIntGamesFromDB(responseBody);
+                return responseBody;
+            } else {
+                responseBody = response.getBody();
+                if(responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.DATABASE_ERROR)) {
+                    throw new DataBaseOperationException(responseBody.get(0).getMessage());
+                } else if(responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.MAPPING_ERROR)) {
+                    throw new MapperException(responseBody.get(0).getMessage());
+                }
+            }
+        }
+        return responseBody;
+    }
+
     public Event saveOrUpdateEvent(Event event, boolean isCreate, boolean isUpdate) throws ValidationException, DataBaseOperationException, MapperException {
         validation.checkEventFromUI(event);
         ResponseEntity<Event> response = dbClient.saveOrUpdateEvent(event, isCreate, isUpdate);
@@ -306,6 +352,21 @@ public class EventService {
             return response.getBody();
         } else {
             return null;
+        }
+    }
+
+    public List<TeamWithPoints> findTeamsWithPoints(Integer eventId) throws ValidationException {
+        if(eventId == null) {
+            LOGGER.error("Validation failed in EventService.class : isLeaderboardComplete for object: null");
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        } else {
+            ResponseEntity<List<TeamWithPoints>> response  = dbClient.findTeamsWithPoints(eventId);
+            if(response.getStatusCode().is2xxSuccessful()) {
+                List<TeamWithPoints> responseBody = response.getBody();
+                return responseBody;
+            } else {
+                throw new ValidationException(StringConstants.FALLBACK_MESSAGE);
+            }
         }
     }
 
