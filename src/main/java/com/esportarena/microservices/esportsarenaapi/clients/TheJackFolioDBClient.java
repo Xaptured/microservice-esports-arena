@@ -65,6 +65,9 @@ public interface TheJackFolioDBClient {
     @GetMapping("/events/get-completed-events-organizer/{email}")
     public ResponseEntity<List<Event>> findAllLeaderboardCompleteOrganizerEvents(@PathVariable String email);
 
+    @GetMapping("/events/get-only-active-events-organizer/{email}")
+    public ResponseEntity<List<Event>> findOnlyActiveOrganizerEvents(@PathVariable String email);
+
     @PostMapping("/events/update-team-status")
     public ResponseEntity<String> updateTeamStatus(@RequestParam String teamName, @RequestParam String teamStatus);
 

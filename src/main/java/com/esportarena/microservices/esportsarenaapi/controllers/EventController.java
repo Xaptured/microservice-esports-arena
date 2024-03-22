@@ -293,6 +293,46 @@ public class EventController {
     }
 
     @Operation(
+            summary = "Find only active organizer events",
+            description = "Find only active organizer events."
+    )
+    @GetMapping("/get-only-active-events-organizer/{email}")
+    @Retry(name = "get-only-active-events-organizer-db-retry", fallbackMethod = "findOnlyActiveOrganizerEventsDbRetry")
+    public ResponseEntity<List<Event>> findOnlyActiveOrganizerEvents(@PathVariable String email) {
+        List<Event> eventResults = null;
+        try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            if(StringUtils.isEmpty(email) || StringUtils.isBlank(email)) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            eventResults = service.findOnlyActiveOrganizerEvents(email);
+        } catch (DataBaseOperationException | MapperException | ValidationException exception) {
+            eventResults = new ArrayList<>();
+            Event event = new Event();
+            event.setMessage(exception.getMessage());
+            eventResults.add(event);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(eventResults);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(eventResults);
+    }
+
+    public ResponseEntity<List<Event>> findOnlyActiveOrganizerEventsDbRetry(String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        Event event = new Event();
+        event.setMessage(StringConstants.FALLBACK_MESSAGE);
+        List<Event> eventsResponse = new ArrayList<>();
+        eventsResponse.add(event);
+        return ResponseEntity.status(HttpStatus.OK).body(eventsResponse);
+    }
+
+    @Operation(
             summary = "Find completed events for an participant",
             description = "Find completed events for an participant."
     )
