@@ -101,11 +101,13 @@ public class EventServiceHelper {
     }
 
     public void checkUpComingEventsWrtIntGamesFromDB(List<Event> events) throws ValidationException {
-        if(events == null || events.isEmpty()) {
-            LOGGER.error("No upcoming active events with respect to interested games");
-            throw new ValidationException("No upcoming active events with respect to interested games");
+//        if(events == null || events.isEmpty()) {
+//            LOGGER.error("No upcoming active events with respect to interested games");
+//            throw new ValidationException("No upcoming active events with respect to interested games");
+//        }
+        if(events != null) {
+            checkDBUpcomingEventsWrtIntGames(events);
         }
-        checkDBUpcomingEventsWrtIntGames(events);
     }
 
     private void checkDBUpcomingEventsWrtIntGames(List<Event> events) throws ValidationException {

@@ -59,6 +59,15 @@ public interface TheJackFolioDBClient {
     @GetMapping("/events/get-upcoming-organizer-events/{email}")
     public ResponseEntity<List<Event>> findAllUpcomingOrganizerEvents(@PathVariable String email);
 
+    @GetMapping("/events/get-completed-events-participant/{email}")
+    public ResponseEntity<List<Event>> findAllLeaderboardCompleteParticipantEvents(@PathVariable String email);
+
+    @GetMapping("/events/get-completed-events-organizer/{email}")
+    public ResponseEntity<List<Event>> findAllLeaderboardCompleteOrganizerEvents(@PathVariable String email);
+
+    @GetMapping("/events/get-only-active-events-organizer/{email}")
+    public ResponseEntity<List<Event>> findOnlyActiveOrganizerEvents(@PathVariable String email);
+
     @PostMapping("/events/update-team-status")
     public ResponseEntity<String> updateTeamStatus(@RequestParam String teamName, @RequestParam String teamStatus);
 
@@ -73,6 +82,9 @@ public interface TheJackFolioDBClient {
 
     @GetMapping("/events/create-sheet/{eventId}")
     public ResponseEntity<byte[]> generateExcel(@PathVariable Integer eventId);
+
+    @GetMapping("/events/get-teams-with-points/{eventId}")
+    public ResponseEntity<List<TeamWithPoints>> findTeamsWithPoints(@PathVariable Integer eventId);
 
     @GetMapping("/events/get-leaderboard/{email}")
     public ResponseEntity<Leaderboard> findLeaderBoard(@RequestParam Integer eventId, @PathVariable String email);
