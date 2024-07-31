@@ -117,9 +117,9 @@ public class EventService {
             ResponseEntity<List<Event>> response = dbClient.findUpcomingEvents(email);
             List<Event> responseBody = response.getBody();
             validation.checkUpComingEventsFromDB(responseBody);
-            if(responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.DATABASE_ERROR)) {
+            if(responseBody != null && responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.DATABASE_ERROR)) {
                 throw new DataBaseOperationException(responseBody.get(0).getMessage());
-            } else if(responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.MAPPING_ERROR)) {
+            } else if(responseBody != null && responseBody.size() == 1 && StringUtils.isNotEmpty(responseBody.get(0).getMessage()) && StringUtils.isNotBlank(responseBody.get(0).getMessage()) && responseBody.get(0).getMessage().equals(StringConstants.MAPPING_ERROR)) {
                 throw new MapperException(responseBody.get(0).getMessage());
             }
             return responseBody;
@@ -294,6 +294,17 @@ public class EventService {
         ResponseEntity<List<ProfileDetail>> response = dbClient.getTeamDetailsForEvent(eventId, eventName, email);
         if(response.getStatusCode().is2xxSuccessful()) {
             List<ProfileDetail> responseBody = response.getBody();
+            return responseBody;
+        } else {
+            throw new ValidationException(StringConstants.FALLBACK_MESSAGE);
+        }
+    }
+
+    public Team getTeamWithEventIDAndEmail(Integer eventId, String eventName, String email) throws ValidationException {
+        validation.checkEventIdEmailEventNameFromUI(eventId, email, eventName);
+        ResponseEntity<Team> response = dbClient.getTeamWithEventIDAndEmail(eventId, eventName, email);
+        if(response.getStatusCode().is2xxSuccessful()) {
+            Team responseBody = response.getBody();
             return responseBody;
         } else {
             throw new ValidationException(StringConstants.FALLBACK_MESSAGE);

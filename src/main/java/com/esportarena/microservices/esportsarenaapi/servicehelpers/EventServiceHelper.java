@@ -83,11 +83,13 @@ public class EventServiceHelper {
     }
 
     public void checkUpComingEventsFromDB(List<Event> events) throws ValidationException {
-        if(events == null || events.isEmpty()) {
-            LOGGER.info("No upcoming active events");
-            throw new ValidationException("No upcoming active events");
+//        if(events == null || events.isEmpty()) {
+//            LOGGER.info("No upcoming active events");
+//            throw new ValidationException("No upcoming active events");
+//        }
+        if (events != null) {
+            checkDBUpcomingEvents(events);
         }
-        checkDBUpcomingEvents(events);
     }
 
     private void checkDBUpcomingEvents(List<Event> events) throws ValidationException {

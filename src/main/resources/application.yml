@@ -43,6 +43,9 @@ resilience4j:
       get-team-db-retry:
         max-attempts: 3
         wait-duration: 5s
+      get-team-for-event-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
       update-team-status-db-retry:
         max-attempts: 3
         wait-duration: 5s
