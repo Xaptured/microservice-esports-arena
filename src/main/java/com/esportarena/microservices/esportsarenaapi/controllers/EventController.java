@@ -159,6 +159,9 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
         isRetryEnabled = false;
+        if(response == null) {
+            response = new ArrayList<>();
+        }
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -359,6 +362,9 @@ public class EventController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(eventResults);
         }
         isRetryEnabled = false;
+        if(eventResults == null) {
+            eventResults = new ArrayList<>();
+        }
         return ResponseEntity.status(HttpStatus.OK).body(eventResults);
     }
 
@@ -599,6 +605,39 @@ public class EventController {
     }
 
     @Operation(
+            summary = "Get team for an event",
+            description = "Get team for an event"
+    )
+    @GetMapping("/get-team-for-event")
+    @Retry(name = "get-team-for-event-db-retry", fallbackMethod = "getTeamWithEventIDAndEmailDbRetry")
+    public ResponseEntity<Team> getTeamWithEventIDAndEmail(@RequestParam Integer eventId, @RequestParam String eventName, @RequestParam String email) {
+        Team response = null;
+        try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            response = service.getTeamWithEventIDAndEmail(eventId, eventName, email);
+        } catch (ValidationException exception) {
+            Team team = new Team();
+            team.setMessage(exception.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public ResponseEntity<Team> getTeamWithEventIDAndEmailDbRetry(Integer eventId, String eventName, String email, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        Team team = new Team();
+        team.setMessage(StringConstants.FALLBACK_MESSAGE);
+        return ResponseEntity.status(HttpStatus.OK).body(team);
+    }
+
+    @Operation(
             summary = "Get remaining players per slot",
             description = "Get remaining players per slot"
     )
@@ -638,6 +677,9 @@ public class EventController {
             response = service.getTeamsWithCount(eventId, eventName);
         } catch (ValidationException exception) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        if(response == null) {
+            response = new ArrayList<>();
         }
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
