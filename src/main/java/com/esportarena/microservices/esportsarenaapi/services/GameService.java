@@ -5,6 +5,7 @@ import com.esportarena.microservices.esportsarenaapi.exceptions.DataBaseOperatio
 import com.esportarena.microservices.esportsarenaapi.exceptions.MapperException;
 import com.esportarena.microservices.esportsarenaapi.exceptions.ValidationException;
 import com.esportarena.microservices.esportsarenaapi.models.Game;
+import com.esportarena.microservices.esportsarenaapi.models.InterestedGame;
 import com.esportarena.microservices.esportsarenaapi.servicehelpers.GameServiceHelper;
 import com.esportarena.microservices.esportsarenaapi.utilities.StringConstants;
 import org.slf4j.Logger;
@@ -49,5 +50,11 @@ public class GameService {
             }
         }
         return responseBody;
+    }
+
+    public List<InterestedGame> findInterestedGamesForUser(String email) {
+        ResponseEntity<List<InterestedGame>> response = dbClient.findAllInterestedGamesForUser(email);
+        List<InterestedGame> interestedGames = response.getBody();
+        return interestedGames;
     }
 }
