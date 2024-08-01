@@ -127,4 +127,7 @@ public interface TheJackFolioDBClient {
 
     @GetMapping("/games/get-active-games")
     public ResponseEntity<List<Game>> findAllActiveGames();
+
+    @GetMapping("/games/get-interested-games/{email}")
+    public ResponseEntity<List<InterestedGame>> findAllInterestedGamesForUser(@PathVariable String email);
 }

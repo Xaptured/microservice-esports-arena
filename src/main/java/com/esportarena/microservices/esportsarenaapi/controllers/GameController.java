@@ -4,6 +4,7 @@ import com.esportarena.microservices.esportsarenaapi.exceptions.DataBaseOperatio
 import com.esportarena.microservices.esportsarenaapi.exceptions.MapperException;
 import com.esportarena.microservices.esportsarenaapi.exceptions.ValidationException;
 import com.esportarena.microservices.esportsarenaapi.models.Game;
+import com.esportarena.microservices.esportsarenaapi.models.InterestedGame;
 import com.esportarena.microservices.esportsarenaapi.services.GameService;
 import com.esportarena.microservices.esportsarenaapi.utilities.StringConstants;
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,6 +70,16 @@ public class GameController {
             activeGames.add(game);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(activeGames);
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(activeGames);
+        return ResponseEntity.status(HttpStatus.OK).body(activeGames);
+    }
+
+    @Operation(
+            summary = "Get all interested games",
+            description = "Get all interested games with a message which defines whether the request is successful or not."
+    )
+    @GetMapping("/get-interested-games/{email}")
+    public ResponseEntity<List<InterestedGame>> findAllInterestedGames(@PathVariable String email) {
+        List<InterestedGame> interestedGames = service.findInterestedGamesForUser(email);
+        return ResponseEntity.status(HttpStatus.OK).body(interestedGames);
     }
 }
