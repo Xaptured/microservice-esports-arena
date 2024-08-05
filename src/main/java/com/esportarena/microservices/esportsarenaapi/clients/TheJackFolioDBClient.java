@@ -53,6 +53,9 @@ public interface TheJackFolioDBClient {
     @GetMapping("/events/get-teams-with-count")
     public ResponseEntity<List<TeamWithCount>> getTeamsWithCount(@RequestParam Integer eventId, @RequestParam String eventName);
 
+    @GetMapping("/events/get-teams-with-id")
+    public ResponseEntity<List<TeamWithID>> getTeamsWithIDs(@RequestParam Integer eventId);
+
     @GetMapping("/events/get-upcoming-events/{email}")
     public ResponseEntity<List<Event>> findUpcomingEvents(@PathVariable String email);
 
