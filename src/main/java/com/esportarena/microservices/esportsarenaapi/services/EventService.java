@@ -333,6 +333,19 @@ public class EventService {
         }
     }
 
+    public List<TeamWithID> getTeamsWithIDs(Integer eventId) throws ValidationException {
+        if (eventId == null) {
+            throw new ValidationException(StringConstants.VALIDATION_ERROR);
+        }
+        ResponseEntity<List<TeamWithID>> response = dbClient.getTeamsWithIDs(eventId);
+        if(response.getStatusCode().is2xxSuccessful()) {
+            List<TeamWithID> responseBody = response.getBody();
+            return responseBody;
+        } else {
+            throw new ValidationException(StringConstants.FALLBACK_MESSAGE);
+        }
+    }
+
     public Leaderboard saveLeaderboard(Leaderboard leaderboard) throws ValidationException, DataBaseOperationException, MapperException {
         validation.checkLeaderboardFromUI(leaderboard);
         ResponseEntity<Leaderboard> response = dbClient.saveLeaderboard(leaderboard);

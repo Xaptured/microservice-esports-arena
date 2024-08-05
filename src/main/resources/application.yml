@@ -112,3 +112,9 @@ resilience4j:
       is-viewer-db-retry:
         max-attempts: 3
         wait-duration: 5s
+      get-teams-with-count-db-retry:
+        max-attempts: 3
+        wait-duration: 5s
+      get-teams-with-id-db-retry:
+        max-attempts: 3
+        wait-duration: 5s

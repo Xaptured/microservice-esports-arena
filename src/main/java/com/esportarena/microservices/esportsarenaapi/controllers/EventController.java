@@ -671,9 +671,16 @@ public class EventController {
             description = "Get team names with counts"
     )
     @GetMapping("/get-teams-with-count")
+    @Retry(name = "get-teams-with-count-db-retry", fallbackMethod = "getTeamsWithCountDbRetry")
     public ResponseEntity<List<TeamWithCount>> getTeamsWithCount(@RequestParam Integer eventId, @RequestParam String eventName) {
         List<TeamWithCount> response = null;
         try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
             response = service.getTeamsWithCount(eventId, eventName);
         } catch (ValidationException exception) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
@@ -681,7 +688,49 @@ public class EventController {
         if(response == null) {
             response = new ArrayList<>();
         }
+        isRetryEnabled = false;
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public ResponseEntity<List<TeamWithCount>> getTeamsWithCountDbRetry(@RequestParam Integer eventId, @RequestParam String eventName, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        List<TeamWithCount> teamWithCounts = new ArrayList<>();
+        return ResponseEntity.status(HttpStatus.OK).body(teamWithCounts);
+    }
+
+    @Operation(
+            summary = "Get team names with ids",
+            description = "Get team names with ids"
+    )
+    @GetMapping("/get-teams-with-id")
+    @Retry(name = "get-teams-with-id-db-retry", fallbackMethod = "getTeamsWithIDDbRetry")
+    public ResponseEntity<List<TeamWithID>> getTeamsWithID(@RequestParam Integer eventId) {
+        List<TeamWithID> response = null;
+        try {
+            if(isRetryEnabled){
+                LOGGER.info(StringConstants.RETRY_MESSAGE);
+            }
+            if(!isRetryEnabled){
+                isRetryEnabled = true;
+            }
+            response = service.getTeamsWithIDs(eventId);
+        } catch (ValidationException exception) {
+            response = new ArrayList<>();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+        if(response == null) {
+            response = new ArrayList<>();
+        }
+        isRetryEnabled = false;
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    public ResponseEntity<List<TeamWithID>> getTeamsWithIDDbRetry(@RequestParam Integer eventId, Exception exception) {
+        isRetryEnabled = false;
+        LOGGER.info(StringConstants.FALLBACK_MESSAGE, exception);
+        List<TeamWithID> teamWithIDs = new ArrayList<>();
+        return ResponseEntity.status(HttpStatus.OK).body(teamWithIDs);
     }
 
     @Operation(
